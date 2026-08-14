@@ -1,0 +1,25 @@
+{
+  "name": "let-me-into-roblox",
+  "version": "0.0.0",
+  "description": "Manage Open Cloud and Roblosecurity credentials seamlessly",
+  "license": "MIT",
+  "author": "evilbocchi",
+  "type": "module",
+  "main": "src/index.js",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "format": "prettier --write .",
+    "demo": "node demo.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "lefthook install"
+  },
+  "dependencies": {
+    "rkkit": "^0.2.0"
+  },
+  "devDependencies": {
+    "lefthook": "^2.1.10",
+    "prettier": "^3.9.6"
+  }
+}
