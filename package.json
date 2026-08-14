@@ -6,20 +6,24 @@
   "author": "evilbocchi",
   "type": "module",
   "main": "src/index.js",
+  "types": "types/index.d.ts",
   "files": [
-    "src"
+    "src",
+    "types"
   ],
   "scripts": {
+    "build": "tsc",
     "format": "prettier --write .",
-    "demo": "node demo.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "lefthook install"
+    "prepare": "npm run build && lefthook install"
   },
   "dependencies": {
     "rkkit": "^0.2.0"
   },
   "devDependencies": {
     "lefthook": "^2.1.10",
-    "prettier": "^3.9.6"
+    "prettier": "^3.9.6",
+    "@types/node": "^24.10.1",
+    "typescript": "^7"
   }
 }

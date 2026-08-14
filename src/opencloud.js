@@ -9,12 +9,12 @@
 /**
  * Gets a CSRF token using the provided ROBLOSECURITY cookie.
  *
- * Will log an error and return undefined if the request fails for any reason, such as an invalid cookie or network issues.
+ * Will return null if the request fails for any reason, such as an invalid cookie or network issues.
  *
  * @param {object} options
  * @param {string} options.url The URL to request the CSRF token from.
  * @param {string} options.roblosecurity The user's ROBLOSECURITY cookie value.
- * @returns {Promise<string>} A promise resolving to the CSRF token string, or undefined if the request failed.
+ * @returns {Promise<string | null>} A promise resolving to the CSRF token string, or null if the request failed.
  */
 export async function getRobloxCsrfToken({ url, roblosecurity }) {
   const res = await fetch(url, {
@@ -51,6 +51,11 @@ export async function createApiKey({
 }) {
   if (!url) url = "https://apis.roblox.com/cloud-authentication/v1/apiKey";
   const csrfToken = await getRobloxCsrfToken({ url, roblosecurity });
+  if (!csrfToken) {
+    throw new Error(
+      "Failed to get CSRF token. Please check your ROBLOSECURITY cookie.",
+    );
+  }
 
   const res = await fetch(url, {
     method: "POST",
