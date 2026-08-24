@@ -46,6 +46,12 @@ The required option is `roblosecurity`. Optional options include `name`, `descri
 
 **When `allowedCidrs` or `scopes` are omitted, the library uses broad defaults.** Set both explicitly for production use and grant only the permissions your application needs.
 
+## Supported Platforms
+
+- Windows
+- macOS
+- Linux (WSL only)
+
 ## Development
 
 ```bash
