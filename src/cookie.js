@@ -1,4 +1,4 @@
-import { execSync } from "child_process";
+import { execFileSync, execSync } from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -29,34 +29,53 @@ function fromRobloxStudio() {
     return fromRobloxStudioWindows();
   } else if (platform === "darwin") {
     return fromRobloxStudioMac();
+  } else if (platform === "linux" && isWsl()) {
+    return fromRobloxStudioWindows("powershell.exe");
   }
   return undefined;
 }
 
 /** @returns {string | undefined} */
-function fromRobloxStudioWindows() {
+function fromRobloxStudioWindows(powershellCommand = "powershell") {
   try {
     // First try the userid postfixed cookie
-    const userId = getWinCred("https://www.roblox.com:RobloxStudioAuthuserid");
+    const userId = getWinCred(
+      "https://www.roblox.com:RobloxStudioAuthuserid",
+      powershellCommand,
+    );
     if (userId) {
       const cookie = getWinCred(
         `https://www.roblox.com:RobloxStudioAuth${COOKIE_NAME}${userId}`,
+        powershellCommand,
       );
       if (cookie) return cookie;
     }
 
     // Fallback to the old cookie
-    return getWinCred(`https://www.roblox.com:RobloxStudioAuth${COOKIE_NAME}`);
+    return getWinCred(
+      `https://www.roblox.com:RobloxStudioAuth${COOKIE_NAME}`,
+      powershellCommand,
+    );
   } catch {
     return undefined;
   }
 }
 
+/** @returns {boolean} */
+function isWsl() {
+  return Boolean(
+    process.env.WSL_INTEROP ||
+    process.env.WSL_DISTRO_NAME ||
+    os.release().toLowerCase().includes("microsoft"),
+  );
+}
+
 /**
  * @param {string} target
+ * @param {string} powershellCommand
  * @returns {string | undefined}
  */
-function getWinCred(target) {
+function getWinCred(target, powershellCommand) {
   try {
     // Encode the target as base64 so we can safely embed it in a literal
     // PS string — no quote escaping, no interpolation surprises, and the
@@ -95,8 +114,9 @@ if ([Win32]::CredReadW($target, 1, 0, [ref]$ptr)) {
 }
 `.trim();
     const encoded = Buffer.from(psScript, "utf16le").toString("base64");
-    const output = execSync(
-      `powershell -NoProfile -EncodedCommand ${encoded}`,
+    const output = execFileSync(
+      powershellCommand,
+      ["-NoProfile", "-NonInteractive", "-EncodedCommand", encoded],
       {
         encoding: "utf8",
         stdio: ["ignore", "pipe", "ignore"],
